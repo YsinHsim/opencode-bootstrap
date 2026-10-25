@@ -213,18 +213,27 @@ if [ "$MODE" = "interview" ]; then
     *)             PROVIDER_KIND="custom" ;;
   esac
 
+  # Required-value prompts must not loop forever: with piped answers the input
+  # can run out, and a bare while loop then spins printing a warning. Give up
+  # after a few tries with a message the user can act on.
+  require_value() {
+    local __var="$1" __q="$2" __tries=0
+    while :; do
+      prompt "$__var" "$__q" ""
+      [ -n "${!__var:-}" ] && return 0
+      __tries=$((__tries + 1))
+      if [ "$__tries" -ge 3 ]; then
+        fail "No value provided for \"$__q\" after 3 attempts.
+     With piped answers, supply every required value in order (see --help)."
+      fi
+      warn "This value is required."
+    done
+  }
+
   case "$PROVIDER_KIND" in
     custom)
-      prompt PROVIDER_URL "Endpoint URL (OpenAI-compatible base URL)" ""
-      while [ -z "$PROVIDER_URL" ]; do
-        warn "An endpoint URL is required for a custom provider."
-        prompt PROVIDER_URL "Endpoint URL (OpenAI-compatible base URL)" ""
-      done
-      prompt PROVIDER_MODEL "Model ID (as the endpoint names it)" ""
-      while [ -z "$PROVIDER_MODEL" ]; do
-        warn "A model ID is required."
-        prompt PROVIDER_MODEL "Model ID (as the endpoint names it)" ""
-      done
+      require_value PROVIDER_URL "Endpoint URL (OpenAI-compatible base URL)"
+      require_value PROVIDER_MODEL "Model ID (as the endpoint names it)"
       PROVIDER_ID="custom"
       ;;
     openai)
