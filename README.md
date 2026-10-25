@@ -162,8 +162,19 @@ Not required. Install only what you use.
 
 **"stdin is not a terminal and has no answers to read."**
 `--interview` needs a terminal to ask questions. Run it directly rather than
-through a script with redirected input, or pipe answers:
-`printf '\n\n\n5\n\n\n\n' | ./install.sh --interview`.
+through a script with redirected input, or pipe answers. There are seven
+questions in order — name, tone, language, provider, MCP, Google, caveman — so
+this skips everything:
+
+```bash
+printf '\n\n\n5\nn\nn\nn\n' | ./install.sh --interview
+```
+
+A custom provider (choice `1`) also asks for an endpoint URL and a model ID
+before the MCP question.
+
+**"No value provided for ... after 3 attempts."**
+Piped answers ran out. Supply every required value in order.
 
 **"opencode not on PATH after install."**
 Open a new shell. The installer puts the binary in `~/.opencode/bin`.
