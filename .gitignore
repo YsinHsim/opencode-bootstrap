@@ -1,0 +1,11 @@
+# Secrets — never commit
+.env
+*.key
+service.json
+opencode.json.bak.*
+AGENTS.md.bak.*
+
+# OS / editor
+.DS_Store
+__pycache__/
+*.pyc
